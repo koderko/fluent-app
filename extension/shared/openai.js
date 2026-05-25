@@ -35,11 +35,21 @@ const OpenAI = (() => {
 
   const pickFallback = async ({ category, exclude = [], n = 10 }) => {
     const data = await loadFallback();
-    const pool = (data[category] && data[category].length ? data[category] : (data.mixed || []));
+    const primary = (data[category] && data[category].length ? data[category] : []);
+    const allWords = [];
+    const seenWord = new Set();
+    const push = (w) => {
+      const k = w.word.toLowerCase();
+      if (!seenWord.has(k)) { seenWord.add(k); allWords.push(w); }
+    };
+    primary.forEach(push);
+    Object.keys(data).forEach((cat) => {
+      if (cat !== category) (data[cat] || []).forEach(push);
+    });
     const excl = new Set(exclude.map((w) => w.toLowerCase()));
-    const available = pool.filter((w) => !excl.has(w.word.toLowerCase()));
-    const shuffled = available.sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, n);
+    let available = allWords.filter((w) => !excl.has(w.word.toLowerCase()));
+    if (!available.length) available = allWords;
+    return available.sort(() => Math.random() - 0.5).slice(0, n);
   };
 
   const chatJSON = async ({ apiKey, system, user, temperature = 0.7 }) => {

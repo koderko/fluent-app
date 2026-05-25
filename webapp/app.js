@@ -103,8 +103,15 @@
     if (state.currentWord) return;
     try {
       const w = await nextWord();
+      if (!w || !w.word) {
+        toast('No more words — check API key or category in Settings.');
+        $('#qWord').textContent = '—';
+        $('#qStatus').textContent = 'Open Settings to add an API key.';
+        return;
+      }
       renderCard(w);
     } catch (e) {
+      console.error(e);
       toast('Could not load word: ' + e.message);
     }
   };
