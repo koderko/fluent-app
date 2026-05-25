@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dev English</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="root">
+    <div id="onboarding" class="hidden">
+      <h2>Setup</h2>
+      <p>Enter your OpenAI API key (or skip to use offline list).</p>
+      <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+      <label>Category
+        <select id="category">
+          <option value="emails">Emails</option>
+          <option value="standups">Standups</option>
+          <option value="code_review">Code review</option>
+          <option value="architecture">Architecture</option>
+          <option value="interview">Interview</option>
+          <option value="mixed" selected>Mixed</option>
+        </select>
+      </label>
+      <div class="row">
+        <button id="saveBtn" class="primary">Save</button>
+        <button id="skipBtn">Skip</button>
+      </div>
+    </div>
+
+    <div id="card" class="hidden">
+      <div class="word" id="word">—</div>
+      <div class="ipa" id="ipa"></div>
+      <div class="actions">
+        <button id="speak" title="Pronounce">🔊</button>
+        <button id="next" title="Next word">Next →</button>
+      </div>
+      <div class="translation" id="translation"></div>
+      <div class="example">
+        <p id="example"></p>
+        <p class="muted" id="exampleTrans"></p>
+      </div>
+      <button id="settings" class="ghost">⚙ Settings</button>
+    </div>
+
+    <div id="loading">Loading…</div>
+  </div>
+
+  <script src="browser-polyfill.js"></script>
+  <script src="shared/speech.js"></script>
+  <script src="shared/openai.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

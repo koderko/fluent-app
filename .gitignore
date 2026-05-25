@@ -1,0 +1,12 @@
+*.key
+.env
+.env.*
+config.local.*
+*.local.json
+.DS_Store
+node_modules/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

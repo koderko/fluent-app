@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#4f46e5" />
+  <title>Dev English – B1→B2</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>📚 Dev English</h1>
+    <nav>
+      <button data-view="quick" class="nav-btn active">Quick</button>
+      <button data-view="session" class="nav-btn">Session</button>
+      <button data-view="stats" class="nav-btn">Stats</button>
+      <button data-view="settings" class="nav-btn" aria-label="Settings">⚙️</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- Onboarding / Settings -->
+    <section id="view-settings" class="view">
+      <h2>Settings</h2>
+      <label>OpenAI API key
+        <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+      </label>
+      <p class="hint">Stored locally in your browser only. Create a separate key with a <a href="https://platform.openai.com/account/limits" target="_blank" rel="noopener">$5 hard limit</a>.</p>
+
+      <label>Category
+        <select id="category">
+          <option value="emails">Emails</option>
+          <option value="standups">Standups</option>
+          <option value="code_review">Code review</option>
+          <option value="architecture">Architecture</option>
+          <option value="interview">Interview</option>
+          <option value="mixed" selected>Mixed</option>
+        </select>
+      </label>
+
+      <label>TTS engine
+        <select id="ttsMode">
+          <option value="browser" selected>Web Speech (free)</option>
+          <option value="openai">OpenAI TTS (paid, better)</option>
+        </select>
+      </label>
+
+      <div class="row">
+        <button id="saveSettings" class="primary">Save</button>
+        <button id="clearKey" class="danger">Clear API key</button>
+      </div>
+      <p class="hint" id="storageInfo"></p>
+    </section>
+
+    <!-- Quick mode -->
+    <section id="view-quick" class="view hidden">
+      <div id="card" class="card">
+        <div class="card-word"><span id="qWord">—</span></div>
+        <div class="card-ipa" id="qIpa"></div>
+        <div class="card-actions">
+          <button id="qSpeak" aria-label="Speak">🔊</button>
+          <button id="qListen" aria-label="Pronounce">🎤</button>
+          <span id="qRecResult"></span>
+        </div>
+        <div class="card-translation" id="qTranslation"></div>
+        <div class="card-example">
+          <p id="qExample"></p>
+          <p class="muted" id="qExampleTrans"></p>
+        </div>
+        <div class="rating">
+          <button data-q="2" class="rate hard">Hard</button>
+          <button data-q="4" class="rate ok">OK</button>
+          <button data-q="5" class="rate easy">Easy</button>
+        </div>
+        <button id="qSkip" class="ghost">Skip →</button>
+      </div>
+      <p id="qStatus" class="muted"></p>
+    </section>
+
+    <!-- Session mode -->
+    <section id="view-session" class="view hidden">
+      <div id="sessionSetup">
+        <h2>Session</h2>
+        <label>How many words?
+          <select id="sessionSize">
+            <option>5</option>
+            <option selected>10</option>
+            <option>15</option>
+          </select>
+        </label>
+        <button id="startSession" class="primary">Start</button>
+      </div>
+      <div id="sessionRun" class="hidden">
+        <div class="progress"><div id="progressBar"></div></div>
+        <div id="sessionCard"></div>
+      </div>
+      <div id="sessionQuiz" class="hidden"></div>
+      <div id="sessionDone" class="hidden">
+        <h3>Session complete 🎉</h3>
+        <p id="sessionScore"></p>
+        <button id="sessionAgain" class="primary">New session</button>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section id="view-stats" class="view hidden">
+      <h2>Stats</h2>
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-num" id="statTotal">0</span><span>Learned</span></div>
+        <div class="stat"><span class="stat-num" id="statDue">0</span><span>Due today</span></div>
+        <div class="stat"><span class="stat-num" id="statStreak">0</span><span>Day streak</span></div>
+        <div class="stat"><span class="stat-num" id="statSessions">0</span><span>Sessions</span></div>
+      </div>
+      <h3>Recent words</h3>
+      <ul id="recentWords"></ul>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="storage.js"></script>
+  <script src="srs.js"></script>
+  <script src="speech.js"></script>
+  <script src="openai.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Dev English – B1→B2",
+  "version": "0.1.0",
+  "description": "Quick English vocabulary for software developers. B1→B2 level.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Dev English",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
+  "host_permissions": ["https://api.openai.com/*", "<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["shared/wordlist.json", "shared/overlay.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "dev-english@local",
+      "strict_min_version": "109.0"
+    }
+  }
+}
