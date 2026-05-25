@@ -10,3 +10,6 @@ node_modules/
 *.swp
 *.swo
 *~
+
+# Local Optiplex deployment (not part of the public app).
+/optiplex/
