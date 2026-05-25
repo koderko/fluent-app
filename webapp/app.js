@@ -85,6 +85,15 @@
   };
 
   // ---------- Quick mode ----------
+  const animateCardIn = () => {
+    const el = $('#card');
+    if (!el) return;
+    el.classList.remove('card-enter', 'card-leave');
+    // Force reflow so the animation re-runs on every render.
+    void el.offsetWidth;
+    el.classList.add('card-enter');
+  };
+
   const renderCard = (w) => {
     state.currentWord = w;
     $('#qWord').textContent = w.word || '—';
@@ -97,6 +106,7 @@
     $('#qStatus').textContent = card
       ? `Seen ${card.repetitions}× · next ${card.dueDate}`
       : 'New word';
+    animateCardIn();
   };
 
   const ensureCurrentWord = async () => {
@@ -139,8 +149,14 @@
   });
 
   $$('.rate').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const q = parseInt(btn.dataset.q, 10);
+      btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
+      const cardEl = $('#card');
+      cardEl?.classList.remove('card-enter');
+      cardEl?.classList.add('card-leave');
+      await new Promise((r) => setTimeout(r, 180));
+      cardEl?.classList.remove('card-leave');
       reviewCurrent(q);
     });
   });
