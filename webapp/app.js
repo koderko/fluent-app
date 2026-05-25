@@ -85,15 +85,6 @@
   };
 
   // ---------- Quick mode ----------
-  const animateCardIn = () => {
-    const el = $('#card');
-    if (!el) return;
-    el.classList.remove('card-enter', 'card-leave');
-    // Force reflow so the animation re-runs on every render.
-    void el.offsetWidth;
-    el.classList.add('card-enter');
-  };
-
   const renderCard = (w) => {
     state.currentWord = w;
     $('#qWord').textContent = w.word || '—';
@@ -106,7 +97,6 @@
     $('#qStatus').textContent = card
       ? `Seen ${card.repetitions}× · next ${card.dueDate}`
       : 'New word';
-    animateCardIn();
   };
 
   const ensureCurrentWord = async () => {
@@ -152,11 +142,7 @@
     btn.addEventListener('click', async () => {
       const q = parseInt(btn.dataset.q, 10);
       btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
-      const cardEl = $('#card');
-      cardEl?.classList.remove('card-enter');
-      cardEl?.classList.add('card-leave');
-      await new Promise((r) => setTimeout(r, 180));
-      cardEl?.classList.remove('card-leave');
+      await new Promise((r) => setTimeout(r, 220));
       reviewCurrent(q);
     });
   });
@@ -348,8 +334,28 @@
   const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const escapeAttr = (s) => escapeHtml(s).replace(/"/g, '&quot;');
 
+  // ---------- Migration ----------
+  // Old SRS code wrote UTC-based dueDates that could land "today" in local time,
+  // making just-reviewed cards immediately re-due. Fix any such entries on load.
+  const migrateDeck = () => {
+    const today = SRS.today();
+    let changed = 0;
+    for (const k of Object.keys(state.deck)) {
+      const c = state.deck[k];
+      if (!c.dueDate || c.dueDate <= today) {
+        const interval = Math.max(1, c.interval || 1);
+        const d = new Date(); d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + interval);
+        c.dueDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        changed++;
+      }
+    }
+    if (changed) Storage.saveDeck(state.deck);
+  };
+
   // ---------- Init ----------
   const init = () => {
+    migrateDeck();
     if (!state.settings.apiKey) {
       switchView('settings');
       toast('Enter API key or use offline wordlist');

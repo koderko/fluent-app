@@ -1,5 +1,5 @@
 // Service Worker — cache shell, network-first for API.
-const CACHE = 'devenglish-v1';
+const CACHE = 'devenglish-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -30,16 +30,17 @@ self.addEventListener('fetch', (e) => {
   // Never cache API calls.
   if (url.hostname === 'api.openai.com') return;
   if (e.request.method !== 'GET') return;
+  // Network-first for same-origin so deploys reach the browser quickly;
+  // fall back to cache when offline.
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      const fetched = fetch(e.request).then((resp) => {
+    fetch(e.request)
+      .then((resp) => {
         if (resp.ok && url.origin === self.location.origin) {
           const copy = resp.clone();
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }
         return resp;
-      }).catch(() => cached);
-      return cached || fetched;
-    })
+      })
+      .catch(() => caches.match(e.request))
   );
 });
