@@ -167,7 +167,8 @@
     const s = state.stats;
     const today = SRS.today();
     if (s.lastDay !== today) {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const y = new Date(Date.now() - 86400000);
+      const yesterday = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
       s.streak = s.lastDay === yesterday ? s.streak + 1 : 1;
       s.lastDay = today;
     }

@@ -3,7 +3,15 @@
 const SRS = (() => {
   const DAY = 86400000;
 
-  const today = () => new Date().toISOString().slice(0, 10);
+  // Use LOCAL date strings (YYYY-MM-DD) consistently — mixing toISOString (UTC)
+  // with local midnight caused due dates to land on "today" in non-UTC zones.
+  const fmt = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const today = () => fmt(new Date());
   const todayMs = () => {
     const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime();
   };
@@ -31,7 +39,7 @@ const SRS = (() => {
     const ef = card.easiness + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
     card.easiness = Math.max(1.3, ef);
     const due = new Date(todayMs() + card.interval * DAY);
-    card.dueDate = due.toISOString().slice(0, 10);
+    card.dueDate = fmt(due);
     return card;
   };
 
