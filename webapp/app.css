@@ -160,6 +160,33 @@ button.ghost { background: transparent; color: var(--muted); }
 .quiz-question { font-size: 1.1rem; margin-bottom: 12px; }
 .quiz-question .blank { background: var(--surface-2); padding: 0 8px; border-radius: 4px; font-weight: 700; }
 
+.mode-tabs {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--surface-2); border-radius: 10px;
+  margin-bottom: 14px;
+}
+.mode-tab {
+  flex: 1; background: transparent; color: var(--muted);
+  border: none; border-radius: 8px; padding: 8px 10px;
+  font-size: 0.9rem; cursor: pointer;
+}
+.mode-tab.active { background: var(--primary); color: white; }
+
+.stats-by-mode { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.stat-row {
+  display: grid; grid-template-columns: 1fr auto auto;
+  align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.stat-row .stat-label { color: var(--text); font-weight: 600; }
+.stat-row .stat-pill {
+  background: var(--surface-2); color: var(--muted);
+  padding: 4px 10px; border-radius: 999px; font-size: 0.85rem;
+}
+.stat-row .stat-pill strong { color: var(--text); }
+.stat-row .stat-pill.due strong { color: var(--primary); }
+
 #qTaskArea input[type=text] {
   width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--surface-2); color: var(--text); font-size: 1rem;

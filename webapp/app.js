@@ -31,6 +31,46 @@
     if (name === 'stats') renderStats();
     if (name === 'quick') ensureCurrentItem();
     if (name === 'settings') renderSettings();
+    if (name === 'quick' || name === 'session') syncModeTabs();
+  };
+
+  // ---------- Active deck switching ----------
+  const syncModeTabs = () => {
+    const cur = state.settings.activeDeck;
+    document.querySelectorAll('[data-mode-tabs] .mode-tab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.mode === cur);
+    });
+    const sel = $('#deckMode');
+    if (sel) sel.value = cur;
+  };
+
+  const setActiveDeck = (type, { goView } = {}) => {
+    if (!type || type === state.settings.activeDeck) {
+      syncModeTabs();
+      return;
+    }
+    state.settings.activeDeck = type;
+    Storage.saveSettings({ activeDeck: type });
+    state.deck = Storage.getDeck(type);
+    state.cache = Storage.getCache(type);
+    state.currentItem = null;
+    // Drop any in-flight session — items belong to a different deck now.
+    if (state.session) {
+      state.session = null;
+      $('#sessionRun')?.classList.add('hidden');
+      $('#sessionQuiz')?.classList.add('hidden');
+      $('#sessionDone')?.classList.add('hidden');
+      $('#sessionSetup')?.classList.remove('hidden');
+    }
+    syncModeTabs();
+    if (goView) switchView(goView);
+    else {
+      // Re-render the visible view.
+      const visible = document.querySelector('.view:not(.hidden)');
+      if (visible?.id === 'view-quick') ensureCurrentItem();
+      if (visible?.id === 'view-stats') renderStats();
+      if (visible?.id === 'view-settings') renderSettings();
+    }
   };
 
   // ---------- Item identity ----------
@@ -60,19 +100,26 @@
   };
 
   $('#saveSettings').addEventListener('click', () => {
-    const prevDeck = state.settings.activeDeck;
     state.settings.apiKey = $('#apiKey').value.trim();
     state.settings.category = $('#category').value;
     state.settings.ttsMode = $('#ttsMode').value;
-    state.settings.activeDeck = $('#deckMode').value;
-    Storage.saveSettings(state.settings);
-    if (prevDeck !== state.settings.activeDeck) {
-      state.deck = Storage.getDeck(state.settings.activeDeck);
-      state.cache = Storage.getCache(state.settings.activeDeck);
-      state.currentItem = null;
+    Storage.saveSettings({
+      apiKey: state.settings.apiKey,
+      category: state.settings.category,
+      ttsMode: state.settings.ttsMode,
+    });
+    const newDeck = $('#deckMode').value;
+    if (newDeck !== state.settings.activeDeck) {
+      setActiveDeck(newDeck, { goView: 'quick' });
+    } else {
+      switchView('quick');
     }
     toast('Saved');
-    switchView('quick');
+  });
+
+  // Tabs in Quick / Session — switch deck instantly.
+  document.querySelectorAll('[data-mode-tabs] .mode-tab').forEach((b) => {
+    b.addEventListener('click', () => setActiveDeck(b.dataset.mode));
   });
 
   $('#clearKey').addEventListener('click', () => {
@@ -621,17 +668,21 @@
   });
 
   // ---------- Stats ----------
+  const MODE_LABELS = { word: 'Slová', phrasal: 'Phrasal verbs', tense: 'Časy' };
   const renderStats = () => {
     state.stats = Storage.getStats();
     state.deck = Storage.getDeck(state.settings.activeDeck);
-    let total = 0, due = 0;
-    for (const t of Storage.DECK_TYPES) {
+    const byMode = $('#statsByMode');
+    byMode.innerHTML = Storage.DECK_TYPES.map((t) => {
       const d = Storage.getDeck(t);
-      total += Object.keys(d).length;
-      due += SRS.dueCount(d);
-    }
-    $('#statTotal').textContent = total;
-    $('#statDue').textContent = due;
+      const learned = Object.keys(d).length;
+      const due = SRS.dueCount(d);
+      return `<div class="stat-row">
+        <span class="stat-label">${escapeHtml(MODE_LABELS[t] || t)}</span>
+        <span class="stat-pill"><strong>${learned}</strong> learned</span>
+        <span class="stat-pill due"><strong>${due}</strong> due</span>
+      </div>`;
+    }).join('');
     $('#statStreak').textContent = state.stats.streak || 0;
     $('#statSessions').textContent = state.stats.sessions || 0;
     const ul = $('#recentWords');

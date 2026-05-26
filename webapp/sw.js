@@ -1,5 +1,5 @@
 // Service Worker — cache shell, network-first for API.
-const CACHE = 'devenglish-v4';
+const CACHE = 'devenglish-v5';
 const ASSETS = [
   './',
   './index.html',

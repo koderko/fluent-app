@@ -64,6 +64,11 @@
 
     <!-- Quick mode -->
     <section id="view-quick" class="view hidden">
+      <div class="mode-tabs" data-mode-tabs>
+        <button class="mode-tab" data-mode="word">Slová</button>
+        <button class="mode-tab" data-mode="phrasal">Phrasal</button>
+        <button class="mode-tab" data-mode="tense">Časy</button>
+      </div>
       <div id="card" class="card">
         <div class="card-word"><span id="qWord">—</span></div>
         <div class="card-ipa" id="qIpa"></div>
@@ -90,6 +95,11 @@
 
     <!-- Session mode -->
     <section id="view-session" class="view hidden">
+      <div class="mode-tabs" data-mode-tabs>
+        <button class="mode-tab" data-mode="word">Slová</button>
+        <button class="mode-tab" data-mode="phrasal">Phrasal</button>
+        <button class="mode-tab" data-mode="tense">Časy</button>
+      </div>
       <div id="sessionSetup">
         <h2>Session</h2>
         <label>How many words?
@@ -116,13 +126,12 @@
     <!-- Stats -->
     <section id="view-stats" class="view hidden">
       <h2>Stats</h2>
+      <div class="stats-by-mode" id="statsByMode"></div>
       <div class="stats-grid">
-        <div class="stat"><span class="stat-num" id="statTotal">0</span><span>Learned</span></div>
-        <div class="stat"><span class="stat-num" id="statDue">0</span><span>Due today</span></div>
         <div class="stat"><span class="stat-num" id="statStreak">0</span><span>Day streak</span></div>
         <div class="stat"><span class="stat-num" id="statSessions">0</span><span>Sessions</span></div>
       </div>
-      <h3>Recent words</h3>
+      <h3>Recent</h3>
       <ul id="recentWords"></ul>
     </section>
   </main>
