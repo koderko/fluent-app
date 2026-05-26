@@ -160,6 +160,18 @@ button.ghost { background: transparent; color: var(--muted); }
 .quiz-question { font-size: 1.1rem; margin-bottom: 12px; }
 .quiz-question .blank { background: var(--surface-2); padding: 0 8px; border-radius: 4px; font-weight: 700; }
 
+#qTaskArea input[type=text] {
+  width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text); font-size: 1rem;
+}
+.tense-feedback {
+  margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+  background: var(--surface-2); color: var(--text); font-size: 0.95rem; text-align: left;
+}
+.tense-feedback.correct { background: var(--easy); color: white; }
+.tense-feedback.wrong { background: var(--hard); color: white; }
+.tense-feedback.hidden { display: none; }
+
 .toast {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   background: var(--surface); border: 1px solid var(--border); padding: 10px 16px;

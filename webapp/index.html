@@ -29,6 +29,14 @@
       </label>
       <p class="hint">Stored locally in your browser only. Create a separate key with a <a href="https://platform.openai.com/account/limits" target="_blank" rel="noopener">$5 hard limit</a>.</p>
 
+      <label>Čo cvičiť (mód)
+        <select id="deckMode">
+          <option value="word" selected>Slová</option>
+          <option value="phrasal">Phrasal verbs</option>
+          <option value="tense">Časy / gramatika</option>
+        </select>
+      </label>
+
       <label>Category
         <select id="category">
           <option value="emails">Emails</option>
@@ -59,7 +67,7 @@
       <div id="card" class="card">
         <div class="card-word"><span id="qWord">—</span></div>
         <div class="card-ipa" id="qIpa"></div>
-        <div class="card-actions">
+        <div class="card-actions" id="qActions">
           <button id="qSpeak" aria-label="Speak">🔊</button>
           <button id="qListen" aria-label="Pronounce">🎤</button>
           <span id="qRecResult"></span>
@@ -69,7 +77,8 @@
           <p id="qExample"></p>
           <p class="muted" id="qExampleTrans"></p>
         </div>
-        <div class="rating">
+        <div id="qTaskArea" class="hidden"></div>
+        <div class="rating" id="qRating">
           <button data-q="2" class="rate hard">Hard</button>
           <button data-q="4" class="rate ok">OK</button>
           <button data-q="5" class="rate easy">Easy</button>
