@@ -1,5 +1,5 @@
 // Service Worker — cache shell, network-first for API.
-const CACHE = 'devenglish-v5';
+const CACHE = 'devenglish-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './srs.js',
   './speech.js',
   './openai.js',
+  './tenses-explain.js',
   './wordlist.json',
   './manifest.webmanifest',
   './icons/icon.svg',

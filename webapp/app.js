@@ -238,14 +238,22 @@
     const area = $('#qTaskArea');
     area.classList.remove('hidden');
 
+    const explainRowHtml = `<div class="explain-row"><button type="button" class="ghost explain-btn">💡 Vysvetli tento čas</button></div>`;
+    const wireExplain = () => {
+      const eb = area.querySelector('.explain-btn');
+      if (eb) eb.addEventListener('click', () => TensesExplain.open(data.tense, { apiKey: state.settings.apiKey }));
+    };
+
     if (data.task === 'mcq') {
       const options = (data.options || []).slice().sort(() => Math.random() - 0.5);
       area.innerHTML = `
+        ${explainRowHtml}
         <div class="quiz-options">
           ${options.map((o) => `<button data-opt="${escapeAttr(o)}">${escapeHtml(o)}</button>`).join('')}
         </div>
         <div class="tense-feedback hidden"></div>
       `;
+      wireExplain();
       area.querySelectorAll('.quiz-options button').forEach((b) => {
         b.addEventListener('click', () => {
           const right = b.dataset.opt.trim().toLowerCase() === (data.answer || '').trim().toLowerCase();
@@ -266,6 +274,7 @@
     // gap_fill or transform — both use a text input.
     const placeholder = data.task === 'gap_fill' ? 'Doplň správny tvar' : 'Prepíš celú vetu';
     area.innerHTML = `
+      ${explainRowHtml}
       <input type="text" id="qTenseInput" placeholder="${escapeAttr(placeholder)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
       <div class="row" style="margin-top:8px;">
         <button id="qTenseCheck" class="primary">Skontrolovať</button>
@@ -273,6 +282,7 @@
       </div>
       <div class="tense-feedback hidden"></div>
     `;
+    wireExplain();
     const input = area.querySelector('#qTenseInput');
     input.focus();
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') area.querySelector('#qTenseCheck').click(); });
@@ -318,12 +328,31 @@
     fb.textContent = text;
   };
 
+  // On correct: auto-advance after a delay. On wrong: show a "Rozumiem"
+  // button so the user can read the correct answer before continuing.
+  const awaitContinue = (container, correct, onContinue, correctDelay = 1100) => {
+    if (correct) {
+      setTimeout(onContinue, correctDelay);
+      return;
+    }
+    if (!container) { onContinue(); return; }
+    const wrap = document.createElement('div');
+    wrap.className = 'row continue-row';
+    wrap.style.marginTop = '12px';
+    wrap.innerHTML = '<button type="button" class="primary continue-btn">Rozumiem</button>';
+    container.appendChild(wrap);
+    const btn = wrap.querySelector('.continue-btn');
+    btn.focus();
+    let done = false;
+    btn.addEventListener('click', () => {
+      if (done) return;
+      done = true;
+      onContinue();
+    });
+  };
+
   const finishTenseAnswer = (correct) => {
-    // Auto-advance with SRS rating after a short delay.
-    setTimeout(() => {
-      const q = correct ? 5 : 2;
-      reviewCurrent(q);
-    }, correct ? 1100 : 2400);
+    awaitContinue($('#qTaskArea'), correct, () => reviewCurrent(correct ? 5 : 2));
   };
 
   const ensureCurrentItem = async () => {
@@ -510,7 +539,8 @@
   const renderTenseSessionBody = (it) => {
     const head = `<div class="card-word">⏳ ${escapeHtml(it.tense || '')}</div>
                   <div class="card-ipa">${escapeHtml(it.task || '')}</div>
-                  <div class="card-example"><p>${escapeHtml(it.prompt || '')}</p></div>`;
+                  <div class="card-example"><p>${escapeHtml(it.prompt || '')}</p></div>
+                  <div class="explain-row"><button type="button" class="ghost explain-btn">💡 Vysvetli tento čas</button></div>`;
     if (it.task === 'mcq') {
       const options = (it.options || []).slice().sort(() => Math.random() - 0.5);
       return head + `<div class="quiz-options">
@@ -528,6 +558,8 @@
   };
 
   const wireTenseSessionBody = (root, it, onDone) => {
+    const explainBtn = root.querySelector('.explain-btn');
+    if (explainBtn) explainBtn.addEventListener('click', () => TensesExplain.open(it.tense, { apiKey: state.settings.apiKey }));
     const apply = (correct) => {
       const id = itemId(it);
       const card = state.deck[id] || SRS.newCard(id, it);
@@ -536,7 +568,7 @@
       state.deck[id] = card;
       Storage.saveDeck(state.deck, state.settings.activeDeck);
       bumpStats(it);
-      setTimeout(onDone, correct ? 1100 : 2400);
+      awaitContinue(root, correct, onDone);
     };
     if (it.task === 'mcq') {
       root.querySelectorAll('.quiz-options button').forEach((b) => {
@@ -644,7 +676,7 @@
             }
           }
           quizEl.querySelectorAll('.quiz-options button').forEach((x) => x.disabled = true);
-          setTimeout(() => { qIdx++; renderQ(); }, 900);
+          awaitContinue(quizEl.querySelector('.card'), right, () => { qIdx++; renderQ(); }, 900);
         });
       });
     };

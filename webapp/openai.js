@@ -243,6 +243,21 @@ Return JSON: {"items":[{"word":"...","sentence":"... ___ ...","distractors":["a"
 
   const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+  const explainTense = async ({ apiKey, tense }) => {
+    if (!apiKey) throw new Error('No API key');
+    const system = 'You teach English grammar to a B1-B2 Slovak-speaking software developer. Be concise and practical. Output strict JSON.';
+    const user = `Give extra practice examples for the English tense: "${tense}".
+Use a software developer context (PRs, deploys, bugs, code reviews, standups).
+Return JSON:
+{"extra_examples":[
+  {"en":"...","sk":"slovenský preklad"},
+  {"en":"...","sk":"..."},
+  {"en":"...","sk":"..."},
+  {"en":"...","sk":"..."}
+],"notes_sk":"1-2 vety praktickej poznámky po slovensky (časté chyby, tip kedy si pomýliť s iným časom)."}`;
+    return chatJSON({ apiKey, system, user, temperature: 0.5 });
+  };
+
   const explain = async ({ apiKey, text }) => {
     if (!apiKey) throw new Error('No API key');
     const system = 'You explain English words/phrases to a B1-B2 Slovak-speaking software developer. Be concise.';
@@ -267,6 +282,6 @@ Return JSON: {"items":[{"word":"...","sentence":"... ___ ...","distractors":["a"
   return {
     generateWords, generatePhrasals, generateTenseItems,
     gradeTenseTransform, generateClozeQuiz, buildPhrasalGapQuiz,
-    explain, tts, loadFallback,
+    explain, explainTense, tts, loadFallback,
   };
 })();
